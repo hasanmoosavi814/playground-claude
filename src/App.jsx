@@ -22,6 +22,12 @@ function App() {
     setTransactions([...transactions, transaction]);
   };
 
+  const deleteTransaction = (id) => {
+    const target = transactions.find((t) => t.id === id);
+    if (!window.confirm(`Delete "${target.description}"?`)) return;
+    setTransactions(transactions.filter((t) => t.id !== id));
+  };
+
   return (
     <div className="app">
       <h1>Finance Tracker</h1>
@@ -31,7 +37,11 @@ function App() {
 
       <TransactionForm categories={categories} onAddTransaction={addTransaction} />
 
-      <TransactionList transactions={transactions} categories={categories} />
+      <TransactionList
+        transactions={transactions}
+        categories={categories}
+        onDeleteTransaction={deleteTransaction}
+      />
     </div>
   );
 }
