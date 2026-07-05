@@ -29,16 +29,36 @@ function App() {
     setTransactions(transactions.filter((t) => t.id !== id));
   };
 
+  const entryLabel = transactions.length === 1 ? "entry" : "entries";
+
   return (
     <div className="app">
-      <h1>Finance Tracker</h1>
-      <p className="subtitle">Track your income and expenses</p>
+      <header className="masthead">
+        <div>
+          <span className="masthead-eyebrow">Personal Ledger</span>
+          <h1>Finance Tracker</h1>
+          <p className="masthead-sub">Track your income and expenses.</p>
+        </div>
+        <div className="masthead-meta">
+          <strong>
+            {transactions.length} {entryLabel}
+          </strong>
+          logged
+        </div>
+      </header>
 
       <Summary transactions={transactions} />
 
-      <CategorySpendingChart transactions={transactions} categories={categories} />
-
-      <TransactionForm categories={categories} onAddTransaction={addTransaction} />
+      <div className="panel-grid">
+        <CategorySpendingChart
+          transactions={transactions}
+          categories={categories}
+        />
+        <TransactionForm
+          categories={categories}
+          onAddTransaction={addTransaction}
+        />
+      </div>
 
       <TransactionList
         transactions={transactions}

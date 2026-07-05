@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState } from "react";
+import { formatCurrency, formatDate } from "../format";
 
 function TransactionList({ transactions, categories, onDeleteTransaction }) {
   const [filterType, setFilterType] = useState("all");
@@ -6,59 +7,99 @@ function TransactionList({ transactions, categories, onDeleteTransaction }) {
 
   let filteredTransactions = transactions;
   if (filterType !== "all") {
-    filteredTransactions = filteredTransactions.filter(t => t.type === filterType);
+    filteredTransactions = filteredTransactions.filter(
+      (t) => t.type === filterType
+    );
   }
   if (filterCategory !== "all") {
-    filteredTransactions = filteredTransactions.filter(t => t.category === filterCategory);
+    filteredTransactions = filteredTransactions.filter(
+      (t) => t.category === filterCategory
+    );
   }
 
+  const count = filteredTransactions.length;
+
   return (
-    <div className="transactions">
-      <h2>Transactions</h2>
-      <div className="filters">
-        <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-          <option value="all">All Types</option>
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
-        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
-          <option value="all">All Categories</option>
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
+    <div className="card ledger">
+      <div className="card-head">
+        <h2 className="card-title">Transactions</h2>
+        <div className="filters">
+          <select
+            className="select select-sm"
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            aria-label="Filter by type"
+          >
+            <option value="all">All types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+          <select
+            className="select select-sm"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            aria-label="Filter by category"
+          >
+            <option value="all">All categories</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredTransactions.map(t => (
-            <tr key={t.id}>
-              <td>{t.date}</td>
-              <td>{t.description}</td>
-              <td>{t.category}</td>
-              <td className={t.type === "income" ? "income-amount" : "expense-amount"}>
-                {t.type === "income" ? "+" : "-"}${t.amount}
-              </td>
-              <td>
-                <button className="delete-btn" onClick={() => onDeleteTransaction(t.id)}>
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {count === 0 ? (
+        <p className="ledger-empty">
+          No transactions match these filters yet.
+        </p>
+      ) : (
+        <div className="table-scroll">
+          <table className="ledger-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th className="num">Amount</th>
+                <th aria-label="Actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTransactions.map((t) => (
+                <tr key={t.id}>
+                  <td className="cell-date">{formatDate(t.date)}</td>
+                  <td className="cell-desc">{t.description}</td>
+                  <td>
+                    <span className="chip">{t.category}</span>
+                  </td>
+                  <td
+                    className={`cell-amount ${
+                      t.type === "income" ? "income" : "expense"
+                    }`}
+                  >
+                    {t.type === "income" ? "+" : "−"}
+                    {formatCurrency(t.amount)}
+                  </td>
+                  <td className="cell-action">
+                    <button
+                      className="row-delete"
+                      onClick={() => onDeleteTransaction(t.id)}
+                      aria-label={`Delete ${t.description}`}
+                      title="Delete"
+                    >
+                      ×
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
-export default TransactionList
+export default TransactionList;
